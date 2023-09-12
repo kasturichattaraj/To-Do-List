@@ -1,21 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>To-Do List</title>
-<style>
+    <title>To-Do List</title>
+    <style>
         body {
             font-family: Georgia, serif;
+            margin: 0;
+            padding: 0;
         }
-        .todo-container {
+        /* Style for the card container */
+        .card-container {
             max-width: 400px;
             margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 128, 128, 0.2); /* Light teal shadow */
+            border-radius: 10px;
+            padding: 20px;
         }
-        .todo-list {
-            list-style: none;
-            padding: 0;
-            font-family: Candara, sans-serif; /* Set the font to Candara */
+        /* Style for the progress bar container */
+        .progress-container {
+            background-color: transparent;
+            padding: 10px 0;
+            position: relative; /* Add position relative to contain the progress bar */
+            display: flex; /* Display title and progress bar side by side */
+            align-items: center; /* Center items vertically */
         }
-        /* Updated the style for the task items without background */
+        /* Style for the progress title */
+        .progress-title {
+            font-family: Georgia, serif; /* Set the font to Georgia */
+            margin-right: 10px; /* Add some spacing between the title and progress bar */
+        }
+        /* Style for the progress bar */
+        progress {
+            width: 100%; /* Make the progress bar fill the container */
+            height: 10px; /* Adjust the height to make it thinner */
+            border-radius: 5px; /* Add rounded corners */
+        }
+        /* Style the progress bar fill for WebKit browsers (Chrome, Safari) */
+        progress::-webkit-progress-value {
+            background-color: teal; /* Teal blue fill color */
+            border-radius: 5px; /* Add rounded corners */
+        }
+        /* Style the progress bar fill for Firefox */
+        progress::-moz-progress-bar {
+            background-color: teal; /* Teal blue fill color */
+            border-radius: 5px; /* Add rounded corners */
+        }
+        /* Updated style for the task items without background */
         .todo-item {
             display: flex;
             justify-content: space-between;
@@ -103,17 +134,28 @@
     </style>
 </head>
 <body>
-<div class="todo-container">
-<h1>To-Do List</h1>
-<div class="input-bar-container">
-<input type="text" id="task" placeholder="Enter a task">
-<button class="add-button" onclick="addTask()">Add Task</button>
-</div>
-<ul class="todo-list" id="todo-list">
+    <!-- Card-like container for the to-do list -->
+    <div class="card-container">
+        <h1>To-Do List</h1>
+        <div class="input-bar-container">
+            <input type="text" id="task" placeholder="Enter a task">
+            <button class="add-button" onclick="addTask()">Add Task</button>
+        </div>
+        <ul class="todo-list" id="todo-list">
+            <!-- Tasks will be added here -->
+        </ul>
+        <!-- Progress bar container inside the card -->
+        <div class="progress-container">
+            <span class="progress-title">Progress:</span>
+            <!-- Add your progress bar here -->
+            <progress id="progress" value="0" max="100"></progress>
+        </div>
+    </div>
 
-</ul>
-</div>
-<script>
+    <script>
+        var totalTasks = 0;
+        var completedTasks = 0;
+
         // Function to add a new task
         function addTask() {
             var taskInput = document.getElementById("task");
@@ -129,6 +171,8 @@
                 `;
                 todoList.appendChild(listItem);
                 taskInput.value = "";
+                totalTasks++;
+                updateProgressBar();
             }
         }
 
@@ -137,15 +181,31 @@
             var taskText = checkbox.nextElementSibling;
             if (checkbox.checked) {
                 taskText.style.textDecoration = "line-through";
+                completedTasks++;
             } else {
                 taskText.style.textDecoration = "none";
+                completedTasks--;
             }
+            updateProgressBar();
         }
 
         // Function to remove a task
         function removeTask(span) {
             var listItem = span.parentElement;
+            var isCompleted = listItem.querySelector("input[type='checkbox']").checked;
             listItem.remove();
+            totalTasks--;
+            if (isCompleted) {
+                completedTasks--;
+            }
+            updateProgressBar();
+        }
+
+        // Function to update the progress bar
+        function updateProgressBar() {
+            var progress = totalTasks === 0 ? 0 : (completedTasks / totalTasks) * 100;
+            var progressBar = document.getElementById("progress");
+            progressBar.value = progress;
         }
     </script>
 </body>
